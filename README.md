@@ -1,0 +1,2 @@
+# sqltraining
+SQL Training Exercises

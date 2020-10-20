@@ -1,0 +1,121 @@
+Implementing a Cloud Data Warehouse in Microsoft Azure Synapse Analytics
+-------------------------------------------------------------------------
+
+Questions:
+
+- What is Azure Synapse Analytics (1 sentence)
+ - powerful engine which allows you to easily analyse big data
+
+- When to use Azure Synapse Analytics (3 bulletpoints)
+
+- What is Massive Parallel Processing (1 sentence)
+
+- What do data distributions in Azure Synapse Analytics look like?
+
+- Partitioning data in Azure Synapse Analytics
+
+- What is Azure SQL Data Warehouse
+	- Cloud based
+	- Enterprise Data Warehouse (EDW)
+	- Uses Massively Parallell processing (MPP)
+	- Ability to run complex queries across petabytes of data quickly
+
+
+- What is Azure Synapse Analytics?
+=================================
+A powerful engine which allows you to easily analyse big data
+
+Components:
+	- Azure Data Lake Storage (ADLS) - Store different types inside 1 location (lake)
+	- Azure SQL Data Warehouse
+	- Azure Analytics
+
+Benefits of an Enterprise Data Solution:
+	- Limitless, worldwide scale (### What makes it limitless?)
+	- Useful Insights - Integrates with Power BI & Artificial Intelligence to provide useful insights (### What makes it useful?)
+	- Unified Experience - one stop shop, consistent, end-to-end solutions in 1 interface, no user skills gaps to bridge
+	- Code free ability - ability to use many languages, but allows you to concentrate on data rather than code
+	- Data Security 
+		- Automated Threat Detection
+		- Always on Data Encryption
+		- Fine grained access control (column level, native row level security)
+	
+When to use Azure Synapse Analytics
+===================================
+- Separation of historical data from source systems for performance
+- Mostly for historical analysis and insights (OLTP vs. OLAP)
+- Independently size compute power, regardless of storage needs
+- Grow or shrink compute power without moving data (elasticity)
+- Pause compute capacity while leaving data intact, pay for only storage
+- Resume compute capacity during operational hours
+
+
+What is Massive Parallel Processing
+===================================
+- Everything is set up for MASSIVE queries, MASSIVE analysis. May be overkill for smaller workloads
+
+- Divides compute by up to 60 different nodes
+	- Each node has its own SQL server database
+	- Each node may have its own storage
+	- Nodes run compute in parallel
+	- Can divide into partitions to process certain pieces of data
+
+Control Node
+	- Front end, interacts with all applications and connections
+	- MPP engine runs on control node, optimizes and coordinates parallel queries
+	
+Compute Node
+	- Provides computational power
+	- Seperated from storage nodes
+	- Scaled using Data Warehouse Units (DWU)
+	- Movement between compute nodes is coordinated by a Data Movement Service (DMS) 
+	
+Data Warehouse Units (DWU)
+	- collection of analytic resources that are provisioned
+	- combines CPU, Memory and IO
+	- scales up and down based on needs
+	- start small, grow bigger - easy to do
+	- be aware that this can get expensive, and charges even if you're not using it!
+
+Data Movement Service (DMS)
+	- Data transport technology
+	- coordinates data movement between compute nodes 
+	- Divides a query into 60 smaller queries that run in parallel
+
+Storage Node
+	- separate from compute in order to keep data at rest
+	- cheaper than data that is being analyzed
+
+
+Implementing Data Dsitribution for a SQL Data Warehouse
+	- basic unit of storage and processing for parallel queries
+	- rows stored across 60 distributions, run in parallel
+	- each compute node manages one or more of the 60 distribtions
+
+1) Replicated Table 
+	- Caches a FULL copy on each compute node
+	- used for SMALL tables
+	- Pros: best performance on small workloads 
+	- Cons: extra storage is required on the compute ($$$)
+			  additional overhead required for writing data
+
+2) Round Robin
+	- distributes data evenly across the table without additional optimization
+	- Pros: Quick Inserts, great for temp or staging tables
+	- Cons: Query performance, specifically joins, are slow as it requires reshuffling of data
+	- query performance is better on a hash distributed table
+	- default option
+
+3) Hash Distributed Table
+	- Uses a hash function to assign each row to a distribution determinalistically
+	- Each table has a distribution column, and designates a hash to each row. The hash function uses field to assign a row across one of 60 distributions 
+	- Typically used for large tables (Facts, Large dimensions)
+	- Pros: Delivers highest query performance 
+	- Cons: Wont work if distribution key can't be updated
+	
+	
+Partitioning data in Azure Synapse Analytics
+============================================
+
+- Table partitions enable dividing data into smaller groups of data
+- Improves efficiency and performance of loading data by use of partition deltion, switch and merging
